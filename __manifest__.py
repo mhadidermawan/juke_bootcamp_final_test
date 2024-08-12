@@ -22,13 +22,15 @@ Long description of module's purpose
 
     # always loaded
     'data': [
-        'views/report_action.xml',
-        'views/report_rental.xml',
+        
         
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/buku_views.xml',
         'views/partner_views.xml',
+
+        'views/report_rental.xml',
+        'views/report_action.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

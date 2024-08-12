@@ -3,10 +3,10 @@
         <field name="name">Transaksi Rental Buku (PDF)</field> 
         <field name="model">library.rental</field> 
         <field name="report_type">qweb-html</field> 
-        <field name="report_name">koleksi_buku.report_rental</field> 
-        <field name="report_file">koleksi_buku.report_rental</field> 
+        <field name="report_name">koleksi_buku.report_rental_transaction</field> 
+        <field name="report_file">koleksi_buku.report_rental_transaction</field> 
         <field name="print_report_name">'Rental - %s' % (object.name)</field> 
-        <field name="binding_model_id" ref="model_rental_report_wizard"/> 
+        <field name="binding_model_id" ref="model_library_rental"/> 
         <field name="binding_view_types">form</field> 
     </record> 
 </odoo>

@@ -153,6 +153,12 @@ class LibraryRental(models.Model):
             else:
                 record.rental_duration = 0
 
+    @api.constrains('rental_date', 'end_date')
+    def _check_dates(self):
+        for record in self:
+            if record.rental_date > record.end_date:
+                raise ValidationError('Tanggal rental tidak boleh lebih dari tanggal selesai.')
+    
     @api.constrains('qty_borrowed', 'book_ids')
     def _check_qty_available(self):
         for record in self:
@@ -204,8 +210,6 @@ class LibraryRental(models.Model):
             self._return_books()
             rental.write({'state': 'done'})
 
-    def action_print_session(self): 
-        return self.env.ref('koleksi_buku.report_rental_transaction_action').report_action(self) 
 
 #Model Button Pada Master Penulis
 class ResPartner(models.Model):
@@ -244,10 +248,27 @@ class RentalReportWizard(models.TransientModel):
     member_ids = fields.Many2many('library.member', string='Peminjam')
 
     def action_print_report(self):
-        data = {
-            'start_date': self.start_date,
-            'end_date': self.end_date,
-            'member_ids': self.member_ids.ids,
+        domain = [('rental_date', '>=', self.start_date), ('rental_date', '<=', self.end_date)]
+        if self.member_ids:
+            domain.append(('member_id', 'in', self.member_ids.ids))
+        records = self.env['library.rental'].search(domain)
+
+        if not records:
+            raise ValidationError("Tidak ada transaksi rental yang ditemukan dalam rentang waktu yang dipilih.")
+
+        return self.env.ref('koleksi_buku.report_rental_transaction_action').report_action(records)
+
+class ReportRentalTransaction(models.AbstractModel):
+    _name = 'report.koleksi_buku.report_rental_transaction'
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        docs = self.env['library.rental'].browse(docids)
+        return {
+            'doc_ids': docids,
+            'doc_model': 'library.rental',
+            'docs': docs,
+            'start_date': data.get('start_date'),
+            'end_date': data.get('end_date'),
+            'member_ids': data.get('member_ids'),
         }
-        return self.env.ref('koleksi_buku.report_rental_transaction_action').report_action(self, data=data)
-        

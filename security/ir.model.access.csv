@@ -8,3 +8,5 @@ access_library_rental_admin_peminjaman,library.rental access for Admin Peminjama
 rental_to_book_access,library.rental access for book,model_library_book,group_admin_peminjaman,1,1,0,0
 rental_to_book_shelf,library.rental access for shelf,model_library_shelf,group_admin_peminjaman,1,0,0,0
 rental_to_book_member,library.rental access for member,model_library_member,group_admin_peminjaman,1,0,0,0
+
+koleksi_buku.access_rental_report_wizard,access_rental_report_wizard,koleksi_buku.model_rental_report_wizard,base.group_user,1,1,1,0

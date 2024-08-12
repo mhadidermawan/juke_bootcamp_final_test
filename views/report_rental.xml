@@ -1,79 +1,35 @@
 <odoo>
-    <template id="header_rental">
-        <t t-if="o and 'company_id' in o">
-            <t t-set="company" t-value="o.company_id"></t>
-        </t>
-        <t t-if="not o or not 'company_id' in o">
-            <t t-set="company" t-value="res_company"></t>
-        </t>
-        <div class="header">
-            <div class="row mt32 mb32">
-                <div class="col-6">
-                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 100px;" />
-                </div>
-                <div class="col-6 text-right">
-                    <span t-field="company.partner_id"/>
-                    <br/>
-                    <span t-field="company.partner_id.street"/>
-                    <br/>
-                    <span t-field="company.partner_id.city"/>
-                    <br/>
-                    <span t-field="company.partner_id.country_id"/>
-                    <br/>
-                    <span t-field="company.partner_id.vat"/>
-                    <br/>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="body_rental">
-        <div class="page">
-            <h2>Report Transaksi Rental</h2>
-            <p>Tanggal: <span t-esc="start_date"/> s/d <span t-esc="end_date"/></p>
-            <table class="table table-bordered mt-4">
-                <thead>
-                    <tr>
-                        <th>Peminjam</th>
-                        <th>Buku</th>
-                        <th>Lokasi</th>
-                        <th>Tanggal Mulai</th>
-                        <th>Tanggal Selesai</th>
-                        <th>Total Biaya Sewa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t t-foreach="docs" t-as="rental">
-                        <tr>
-                            <td><span t-esc="rental.member_id.name"/></td>
-                            <td>
+    <template id="report_rental_transaction">
+        <t t-call="web.external_layout">
+            <main>
+                <div class="page">
+                    <h2>Rental Transactions Report</h2>
+                    <table class="table table-sm table-hover" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Peminjam</th>
+                                <th style="width: 50%;">Buku</th>
+                                <th style="width: 15%;">Tanggal Mulai</th>
+                                <th style="width: 15%;">Tanggal Selesai</th>
+                                <th style="width: 10%;">Total Biaya Sewa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="rental">
                                 <t t-foreach="rental.book_ids" t-as="book">
-                                    <span t-esc="book.name"/><br/>
+                                    <tr>
+                                        <td><span t-field="rental.member_id.name"/></td>
+                                        <td><span t-field="book.name"/></td>
+                                        <td><span t-field="rental.start_date"/></td>
+                                        <td><span t-field="rental.end_date"/></td>
+                                        <td class="text-right"><span t-field="rental.total_rental_fee"/></td>
+                                    </tr>
                                 </t>
-                            </td>
-                            <td><span t-esc="rental.location"/></td>
-                            <td><span t-esc="rental.start_date"/></td>
-                            <td><span t-esc="rental.end_date"/></td>
-                            <td><span t-esc="rental.total_rental_fee"/></td>
-                        </tr>
-                    </t>
-                </tbody>
-            </table>
-        </div>
-    </template>
-
-    <template id="report_rental">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-call="koleksi_buku.header_rental"/>
-                <t t-call="web.external_layout">
-                    <t t-call="koleksi_buku.body_rental"/>
-                </t>
-            </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
         </t>
     </template>
-
-
-
-
 </odoo>
