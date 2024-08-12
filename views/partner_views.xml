@@ -1,0 +1,25 @@
+<odoo> 
+
+    <!-- Custom View Form untuk Penulis di res.partner --> 
+    <record id="library_res_partner_view_form" model="ir.ui.view"> 
+        <field name="name">library.res.partner.form</field> 
+        <field name="model">res.partner</field> 
+        <field name="inherit_id" ref="base.view_partner_form"/> 
+        <field name="arch" type="xml"> 
+            <notebook position="inside"> 
+                <page string="Books"> 
+                    <group> 
+                        <field name="is_author"/> 
+                    </group> 
+                    <group string="Daftar Buku Ditulis"> 
+                        <field name="book_ids" nolabel="1" colspan="2"/> 
+                    </group> 
+                </page> 
+            </notebook> 
+        </field> 
+    </record> 
+
+
+
+
+</odoo>

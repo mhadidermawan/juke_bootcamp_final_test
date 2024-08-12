@@ -1,0 +1,217 @@
+<odoo>
+    <!-- Membuat View Tree/List Book Library -->
+    <record id="view_library_book_tree" model="ir.ui.view">
+        <field name="name">library.book.tree</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <tree string="Library Book List">
+                <field name="name" string="Judul"/>
+                <field name="category" string="Category"/>
+                <field name="authors_names" string="Authors"/>
+                <field name="publish_date" string="Tanggal Terbit"/>
+                <field name="isbn_code" string="Kode ISBN"/>
+                <field name="serial_number" string="Serial Number"/>
+                <field name="rak_id" string="Rak"/>
+                <field name="qty_available" string="Qty Tersedia"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Membuat View Form Book Library -->
+    <record id="view_library_book_form" model="ir.ui.view">
+        <field name="name">library.book.form</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <form string="Library Book">
+                <header>
+                    <button name="action_view_rentals" type="object" string="Lihat Buku yang Dirental" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="category"/>
+                        <field name="publish_date"/>
+                        <field name="author_ids"/>
+                        <field name="isbn_code"/>
+                        <field name="serial_number"/>
+                        <field name="rak_id"/>
+                        <field name="qty_available"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Membuat Tree View untuk library.member -->
+    <record id="view_library_member_tree" model="ir.ui.view">
+        <field name="name">library.member.tree</field>
+        <field name="model">library.member</field>
+        <field name="arch" type="xml">
+            <tree string="Library Members">
+                <field name="name"/>
+                <field name="identity_number"/>
+                <field name="identity_type"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Membuat Form View untuk library.member -->
+    <record id="view_library_member_form" model="ir.ui.view">
+        <field name="name">library.member.form</field>
+    <field name="model">library.member</field>
+    <field name="arch" type="xml">
+        <form string="Library Member">
+            <header>
+                <button name="action_send_for_approval" type="object" string="Send for Approval" class="btn-primary" groups="koleksi_buku.group_admin_member"/>
+                <button name="action_approve" type="object" string="Approve" class="btn-primary" groups="koleksi_buku.group_manajer_member"/>
+                <button name="action_reject" type="object" string="Reject" class="btn-secondary" groups="koleksi_buku.group_manajer_member"/>
+            </header>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="identity_number"/>
+                    <field name="identity_type"/>
+                    <field name="state" readonly="1"/>
+                    <field name="manager_id"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+    </record>
+
+
+    <!-- Membuat Tree View untuk library.rental -->
+    <record id="view_library_rental_tree" model="ir.ui.view">
+        <field name="name">library.rental.tree</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <tree string="Library Rentals">
+                <field name="rental_date"/>
+                <field name="member_id"/>
+                <field name="qty_borrowed"/>
+                <field name="rental_duration" string="Lama Peminjaman (Hari)"/>
+                <field name="total_rental_fee"/>
+                <field name="state"/>
+                <!-- Tombol Selesai -->
+                <button name="action_done" string="Selesai" type="object" class="oe_highlight"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Membuat Form View untuk library.rental -->
+    <record id="view_library_rental_form" model="ir.ui.view">
+        <field name="name">library.rental.form</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <form string="Library Rental">
+                <header> 
+                    <button name="action_print_session" type="object" string="Print Session" invisible="state != 'open'" class="oe_highlight"/> 
+                </header> 
+                <sheet>
+                    <group>
+                        <field name="rental_date"/>
+                        <field name="member_id"/>
+                        <field name="book_ids"/>
+                        <field name="qty_borrowed"/>
+                        <field name="start_date" readonly="1" invisible="1"/>
+                        <field name="end_date"/>
+                        <field name="total_rental_fee"/>
+                        <field name="state" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Membuat View Search untuk Menu List Buku -->
+    <record id="library_book_view_search" model="ir.ui.view">
+        <field name="name">library.book.search</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <search string="Cari Buku">
+                <!-- Bidang Pencarian -->
+                <field name="name" string="Judul" filter_domain="['|', ('name', 'ilike', self), ('category', 'ilike', self)]"/>
+                <field name="category" string="Kategori"/>
+                <field name="publish_date" string="Tanggal Terbit"/>
+                
+                <!-- Opsi Group By -->
+                <group string="Kelompokkan Berdasarkan">
+                    <filter name="group_by_category" string="Kategori" context="{'group_by': 'category'}"/>
+                    <filter name="group_by_location_rack" string="Lokasi Rak" context="{'group_by': 'rak_id'}"/>
+                    <filter name="group_by_publish_date" string="Tanggal Terbit" context="{'group_by': 'publish_date'}"/>
+                </group>
+                
+                <searchpanel>
+                    <field name="category" icon="fa-tag" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+
+
+
+    <!-- Action for Books -->
+    <record id="action_library_books" model="ir.actions.act_window">
+        <field name="name">Books</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first book record
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Members -->
+    <record id="action_library_members" model="ir.actions.act_window">
+        <field name="name">Members</field>
+        <field name="res_model">library.member</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register your first library member
+            </p>
+        </field>
+    </record>
+
+    <!-- Action for Rentals -->
+    <record id="action_library_rentals" model="ir.actions.act_window">
+        <field name="name">Rentals</field>
+        <field name="res_model">library.rental</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Masukkan Transaksi Rental Buku Perpustakaan
+            </p>
+        </field>
+    </record>
+
+    
+    
+
+    
+    
+    
+    <!-- Membuat Dashboard Menu -->
+    <menuitem id="menu_dashboard_book" name="Buku Perpustakaan"/>
+
+    <!-- Membuat Menu Bar Master Buku -->
+    <menuitem id="menu_bar_master_book" name="Buku" parent="menu_dashboard_book"/>
+    <!-- Membuat Menu Bar Master Member -->
+    <menuitem id="menu_bar_master_member" name="Member" parent="menu_dashboard_book"/>
+    <!-- Membuat Menu Bar Transaksi Rental -->
+    <menuitem id="menu_bar_transakasi" name="Transaksi Rental" parent="menu_dashboard_book"/>
+
+
+
+    <!-- Membuat Menu Item Master Buku -->
+    <menuitem id="menu_item_book" name="List Buku" parent="menu_bar_master_book" action="action_library_books"/>
+    <!-- Membuat Menu Item Master Member -->
+    <menuitem id="menu_item_member" name="List Member" parent="menu_bar_master_member" action="action_library_members"/>
+    <!-- Membuat Menu Item Master Transaksi -->
+    <menuitem id="menu_item_transaksi" name="Transaksi Rental" parent="menu_bar_transakasi" action="action_library_rentals"/>
+
+</odoo>

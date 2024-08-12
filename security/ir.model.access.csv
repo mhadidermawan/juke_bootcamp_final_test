@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_book_admin_buku,library.book access for Admin Buku,model_library_book,group_admin_buku,1,1,1,1
+access_library_member_admin_member,library.member access for Admin Member,model_library_member,group_admin_member,1,1,1,0
+access_library_member_manajer_member,library.member access for Manajer Member,model_library_member,group_manajer_member,1,1,1,1
+access_library_rental_admin_peminjaman,library.rental access for Admin Peminjaman,model_library_rental,group_admin_peminjaman,1,1,1,1
+
+
+rental_to_book_access,library.rental access for book,model_library_book,group_admin_peminjaman,1,1,0,0
+rental_to_book_shelf,library.rental access for shelf,model_library_shelf,group_admin_peminjaman,1,0,0,0
+rental_to_book_member,library.rental access for member,model_library_member,group_admin_peminjaman,1,0,0,0
