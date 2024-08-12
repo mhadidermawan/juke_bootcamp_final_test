@@ -1,6 +1,9 @@
-from odoo import models, fields, api
+from odoo import models, fields, api,  _
 from odoo.exceptions import ValidationError
 from datetime import timedelta
+import logging
+
+_logger = logging.getLogger(__name__)
 
 # Model Buku Perpustakaan
 class LibraryBook(models.Model):
@@ -73,7 +76,7 @@ class LibraryBook(models.Model):
 class LibraryMember(models.Model):
     _name = 'library.member'
     _description = 'Library Member'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='Name', required=True)
     identity_number = fields.Char(string='No Identitas', required=True, unique=True)
@@ -103,22 +106,49 @@ class LibraryMember(models.Model):
         for record in self:
             record.show_approve_reject = record.state == 'pending'
 
+    @api.model
+    def create(self, vals):
+        vals['state'] = 'draft'
+        member = super(LibraryMember, self).create(vals)
+        
+        if member.manager_id:
+            member.activity_schedule(
+                'mail.mail_activity_data_todo',  # Activity type
+                user_id=member.manager_id.id,
+                summary=_('New Member Approval Needed'),
+                note=_('Please review and approve the new member: %s' % member.name),
+            )
+        
+        return member
+
+
     def action_approve(self):
-        self.write({'state': 'approved'})
+        self.ensure_one()
+        if self.state == 'pending':
+            self.write({'state': 'approved'})
+            self.activity_feedback(['mail.mail_activity_data_todo'])
         
     def action_reject(self):
-        self.write({'state': 'rejected'})
+        self.ensure_one()
+        if self.state == 'pending':
+            self.write({'state': 'rejected'})
+            self.activity_feedback(['mail.mail_activity_data_todo'])  # Mark the approval activity as done
 
-    def action_send_for_approval(self):
-        self.write({'state': 'pending'})
-        if self.manager_id:
-            self.message_post(
-                body=f'Member {self.name} membutuhkan persetujuan.',
-                partner_ids=[self.manager_id.partner_id.id],
-                message_type='notification',
-                subtype_xmlid='mail.mt_comment',
-            )
-
+    # def action_send_for_approval(self):
+    #     self.write({'state': 'pending'})
+    #     if self.manager_id:
+    #         # Post a message directly to the manager's inbox
+    #         self.env['mail.message'].create({
+    #             'subject': 'Approval Needed',
+    #             'body': f'Member {self.name} needs your approval.',
+    #             'message_type': 'notification',
+    #             'subtype_id': self.env.ref('mail.mt_comment').id,
+    #             'partner_ids': [(4, self.manager_id.partner_id.id)],
+    #             'author_id': self.env.user.partner_id.id,
+    #             'email_from': self.env.user.partner_id.email,
+    #         })
+    
+    
 # Model Transaksi Rental
 class LibraryRental(models.Model):
     _name = 'library.rental'
