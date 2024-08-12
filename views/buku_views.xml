@@ -63,7 +63,7 @@
     <field name="arch" type="xml">
         <form string="Library Member">
             <header>
-                <!-- <button name="action_send_for_approval" type="object" string="Send for Approval" class="btn-primary" groups="koleksi_buku.group_admin_member"/> -->
+                <button name="action_send_for_approval" type="object" string="Send for Approval" class="btn-primary" groups="koleksi_buku.group_admin_member"/>
                 <button name="action_approve" type="object" string="Approve" class="btn-primary" groups="koleksi_buku.group_manajer_member"/>
                 <button name="action_reject" type="object" string="Reject" class="btn-secondary" groups="koleksi_buku.group_manajer_member"/>
             </header>
@@ -149,7 +149,7 @@
         </field>
     </record>
 
-
+    <!-- Membuat View Form untuk Report Wizard -->
     <record id="rental_report_wizard_form" model="ir.ui.view">
         <field name="name">rental.report.wizard.form</field>
         <field name="model">rental.report.wizard</field>
@@ -168,6 +168,7 @@
         </field>
     </record>
 
+    <!-- Membuat Action untuk Report Wizard -->
     <record id="rental_report_wizard_action" model="ir.actions.act_window">
         <field name="name">Filter Report Rental</field>
         <field name="res_model">rental.report.wizard</field>

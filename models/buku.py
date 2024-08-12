@@ -54,7 +54,6 @@ class LibraryBook(models.Model):
 
     def _update_author_books(self):
         for book in self:
-            # Update each author with the new book
             if book.author_ids:
                 book.author_ids.write({'book_ids': [(4, book.id)]})
 
@@ -113,7 +112,7 @@ class LibraryMember(models.Model):
         
         if member.manager_id:
             member.activity_schedule(
-                'mail.mail_activity_data_todo',  # Activity type
+                'mail.mail_activity_data_todo',
                 user_id=member.manager_id.id,
                 summary=_('New Member Approval Needed'),
                 note=_('Please review and approve the new member: %s' % member.name),
@@ -121,32 +120,30 @@ class LibraryMember(models.Model):
         
         return member
 
+    def action_send_for_approval(self):
+        for record in self:
+            if record.state == 'draft':
+                record.state = 'pending'
+                if record.manager_id:
+                    record.activity_schedule(
+                        'mail.mail_activity_data_todo',
+                        user_id=record.manager_id.id,
+                        summary=_('Member Approval Request'),
+                        note=_('Please review and approve the new member: %s' % record.name),
+                    )
 
     def action_approve(self):
-        self.ensure_one()
-        if self.state == 'pending':
-            self.write({'state': 'approved'})
-            self.activity_feedback(['mail.mail_activity_data_todo'])
+        for record in self:
+            if record.state == 'pending':
+                record.state = 'approved'
+                record.activity_feedback(['mail.mail_activity_data_todo'])
         
     def action_reject(self):
-        self.ensure_one()
-        if self.state == 'pending':
-            self.write({'state': 'rejected'})
-            self.activity_feedback(['mail.mail_activity_data_todo'])  # Mark the approval activity as done
+        for record in self:
+            if record.state == 'pending':
+                record.state = 'rejected'
+                record.activity_feedback(['mail.mail_activity_data_todo'])
 
-    # def action_send_for_approval(self):
-    #     self.write({'state': 'pending'})
-    #     if self.manager_id:
-    #         # Post a message directly to the manager's inbox
-    #         self.env['mail.message'].create({
-    #             'subject': 'Approval Needed',
-    #             'body': f'Member {self.name} needs your approval.',
-    #             'message_type': 'notification',
-    #             'subtype_id': self.env.ref('mail.mt_comment').id,
-    #             'partner_ids': [(4, self.manager_id.partner_id.id)],
-    #             'author_id': self.env.user.partner_id.id,
-    #             'email_from': self.env.user.partner_id.email,
-    #         })
     
     
 # Model Transaksi Rental
@@ -211,7 +208,6 @@ class LibraryRental(models.Model):
     def write(self, vals):
         res = super(LibraryRental, self).write(vals)
         
-        # Update quantity when the state changes
         if 'state' in vals and vals['state'] == 'done':
             self._return_books()
         else:
